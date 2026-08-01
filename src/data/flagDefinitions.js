@@ -137,8 +137,69 @@ export const flagDefinitions = [
   { code: 'se', layout: 'nordic-cross', colors: [blue, yellow], symbols: [] },
   { code: 'dk', layout: 'nordic-cross', colors: [red, white], symbols: [] },
   { code: 'fi', layout: 'nordic-cross', colors: [white, blue], symbols: [] },
-  { code: 'no', layout: 'nordic-cross', colors: [red, white], symbols: [] },
-  { code: 'is', layout: 'nordic-cross', colors: [blue, white], symbols: [] },
+  { code: 'no', layout: 'nordic-cross-bordered', colors: [red, white, blue], symbols: [] },
+  { code: 'is', layout: 'nordic-cross-bordered', colors: [blue, white, red], symbols: [] },
+
+  // Canton-Flaggen
+  {
+    code: 'us',
+    layout: 'canton-stripes',
+    colors: [blue, red, white, red, white, red],
+    symbols: [{ type: 'star', color: white, position: 'top-left', size: 0.22 }],
+  },
+  {
+    code: 'my',
+    layout: 'canton-stripes',
+    colors: [blue, red, white, red, white, red],
+    symbols: [
+      { type: 'crescent', color: yellow, position: 'top-left', size: 0.28 },
+      { type: 'star', color: yellow, position: 'top-left', size: 0.14 },
+    ],
+  },
+  {
+    code: 'au',
+    layout: 'canton-plain',
+    colors: [blue, blue],
+    symbols: [
+      { type: 'star', color: white, position: 'top-left', size: 0.18 },
+      { type: 'star', color: white, position: 'center-right', size: 0.2 },
+    ],
+  },
+  {
+    code: 'nz',
+    layout: 'canton-plain',
+    colors: [blue, blue],
+    symbols: [
+      { type: 'star', color: red, position: 'center-right', size: 0.18 },
+      { type: 'star', color: red, position: 'top', size: 0.14 },
+    ],
+  },
+  {
+    code: 'fj',
+    layout: 'canton-plain',
+    colors: [blue, lightBlue],
+    symbols: [{ type: 'star', color: white, position: 'top-left', size: 0.16 }],
+  },
+
+  // Weitere Speziallayouts
+  {
+    code: 'cz',
+    layout: 'hoist-triangle',
+    colors: [blue, white, red],
+    symbols: [],
+  },
+  {
+    code: 'bh',
+    layout: 'serrated-hoist',
+    colors: [white, red],
+    symbols: [],
+  },
+  {
+    code: 'qa',
+    layout: 'serrated-hoist',
+    colors: [white, red],
+    symbols: [],
+  },
 
   // Mit Wappen
   {

@@ -24,6 +24,13 @@
         <p>Ein Land wird genannt – baue die Flagge aus Streifen, Farben und Symbolen (Sterne, Halbmond, Wappen …).</p>
         <span class="mode-cta">Bauen →</span>
       </router-link>
+
+      <router-link to="/flaggen" class="mode-card">
+        <div class="mode-icon">🗺️</div>
+        <h2>Alle Flaggen</h2>
+        <p>Übersicht aller verfügbaren Flaggen, geordnet nach Kontinent.</p>
+        <span class="mode-cta">Ansehen →</span>
+      </router-link>
     </div>
   </div>
 </template>

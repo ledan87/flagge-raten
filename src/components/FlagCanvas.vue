@@ -1,6 +1,6 @@
 <script setup>
 import { computed } from 'vue'
-import { getSymbol, getPosition, getLayout } from '../data/symbols.js'
+import { getSymbol, getPosition, getLayout, CANTON } from '../data/symbols.js'
 
 const props = defineProps({
   definition: {
@@ -15,7 +15,6 @@ const props = defineProps({
     type: Boolean,
     default: true,
   },
-  /** Farbe zum Auftragen per Klick; null = nicht interaktiv */
   paintColor: {
     type: String,
     default: null,
@@ -28,20 +27,134 @@ const height = computed(() => Math.round((props.width * 2) / 3))
 const layout = computed(() => getLayout(props.definition.layout))
 const interactive = computed(() => !!props.paintColor)
 
-function stripeRects() {
+const W = 300
+const H = 200
+
+function buildShapes() {
   const colors = props.definition.colors || ['#ccc']
   const l = layout.value
-  const w = 300
-  const h = 200
-  const rects = []
+  const shapes = []
 
   if (l.special === 'nordic') {
-    const bg = colors[0] || '#006AA7'
-    const cross = colors[1] || '#FECC00'
-    rects.push({ x: 0, y: 0, width: w, height: h, fill: bg, index: 0 })
-    rects.push({ x: w * 0.28, y: 0, width: w * 0.14, height: h, fill: cross, index: 1 })
-    rects.push({ x: 0, y: h * 0.4, width: w, height: h * 0.2, fill: cross, index: 1 })
-    return rects
+    shapes.push({ type: 'rect', x: 0, y: 0, width: W, height: H, fill: colors[0] || '#ccc', index: 0 })
+    shapes.push({
+      type: 'rect',
+      x: W * 0.28,
+      y: 0,
+      width: W * 0.14,
+      height: H,
+      fill: colors[1] || '#ccc',
+      index: 1,
+    })
+    shapes.push({
+      type: 'rect',
+      x: 0,
+      y: H * 0.4,
+      width: W,
+      height: H * 0.2,
+      fill: colors[1] || '#ccc',
+      index: 1,
+    })
+    return shapes
+  }
+
+  if (l.special === 'nordic-bordered') {
+    shapes.push({ type: 'rect', x: 0, y: 0, width: W, height: H, fill: colors[0] || '#ccc', index: 0 })
+    // outer cross
+    shapes.push({
+      type: 'rect',
+      x: W * 0.26,
+      y: 0,
+      width: W * 0.18,
+      height: H,
+      fill: colors[1] || '#ccc',
+      index: 1,
+    })
+    shapes.push({
+      type: 'rect',
+      x: 0,
+      y: H * 0.36,
+      width: W,
+      height: H * 0.28,
+      fill: colors[1] || '#ccc',
+      index: 1,
+    })
+    // inner cross
+    shapes.push({
+      type: 'rect',
+      x: W * 0.3,
+      y: 0,
+      width: W * 0.1,
+      height: H,
+      fill: colors[2] || '#ccc',
+      index: 2,
+    })
+    shapes.push({
+      type: 'rect',
+      x: 0,
+      y: H * 0.42,
+      width: W,
+      height: H * 0.16,
+      fill: colors[2] || '#ccc',
+      index: 2,
+    })
+    return shapes
+  }
+
+  if (l.special === 'canton-plain') {
+    const cw = W * (l.canton?.w ?? CANTON.w)
+    const ch = H * (l.canton?.h ?? CANTON.h)
+    shapes.push({ type: 'rect', x: 0, y: 0, width: W, height: H, fill: colors[1] || '#ccc', index: 1 })
+    shapes.push({ type: 'rect', x: 0, y: 0, width: cw, height: ch, fill: colors[0] || '#ccc', index: 0 })
+    return shapes
+  }
+
+  if (l.special === 'canton-stripes') {
+    const n = l.stripeCount || 5
+    const cw = W * (l.canton?.w ?? CANTON.w)
+    const ch = H * (l.canton?.h ?? CANTON.h)
+    const sh = H / n
+    for (let i = 0; i < n; i++) {
+      shapes.push({
+        type: 'rect',
+        x: 0,
+        y: i * sh,
+        width: W,
+        height: sh,
+        fill: colors[i + 1] || '#ccc',
+        index: i + 1,
+      })
+    }
+    shapes.push({ type: 'rect', x: 0, y: 0, width: cw, height: ch, fill: colors[0] || '#ccc', index: 0 })
+    return shapes
+  }
+
+  if (l.special === 'hoist-triangle') {
+    shapes.push({
+      type: 'rect',
+      x: 0,
+      y: 0,
+      width: W,
+      height: H / 2,
+      fill: colors[1] || '#ccc',
+      index: 1,
+    })
+    shapes.push({
+      type: 'rect',
+      x: 0,
+      y: H / 2,
+      width: W,
+      height: H / 2,
+      fill: colors[2] || '#ccc',
+      index: 2,
+    })
+    shapes.push({
+      type: 'polygon',
+      points: `0,0 ${W * 0.38},${H / 2} 0,${H}`,
+      fill: colors[0] || '#ccc',
+      index: 0,
+    })
+    return shapes
   }
 
   if (l.direction === 'horizontal') {
@@ -49,42 +162,95 @@ function stripeRects() {
     const total = ratios.reduce((a, b) => a + b, 0)
     let y = 0
     for (let i = 0; i < l.stripes; i++) {
-      const sh = (h * ratios[i]) / total
-      rects.push({ x: 0, y, width: w, height: sh, fill: colors[i] || '#ccc', index: i })
+      const sh = (H * ratios[i]) / total
+      shapes.push({
+        type: 'rect',
+        x: 0,
+        y,
+        width: W,
+        height: sh,
+        fill: colors[i] || '#ccc',
+        index: i,
+      })
       y += sh
     }
-  } else if (l.direction === 'vertical') {
+    return shapes
+  }
+
+  if (l.direction === 'vertical') {
     const ratios = l.ratios || Array(l.stripes).fill(1)
     const total = ratios.reduce((a, b) => a + b, 0)
     let x = 0
     for (let i = 0; i < l.stripes; i++) {
-      const sw = (w * ratios[i]) / total
-      rects.push({ x, y: 0, width: sw, height: h, fill: colors[i] || '#ccc', index: i })
+      const sw = (W * ratios[i]) / total
+      shapes.push({
+        type: 'rect',
+        x,
+        y: 0,
+        width: sw,
+        height: H,
+        fill: colors[i] || '#ccc',
+        index: i,
+      })
       x += sw
     }
-  } else {
-    rects.push({ x: 0, y: 0, width: w, height: h, fill: colors[0] || '#ccc', index: 0 })
+    return shapes
   }
 
-  return rects
+  shapes.push({ type: 'rect', x: 0, y: 0, width: W, height: H, fill: colors[0] || '#ccc', index: 0 })
+  return shapes
 }
 
 function layoutContours() {
   const l = layout.value
-  const w = 300
-  const h = 200
   const lines = []
 
   if (l.special === 'nordic') {
-    const vx = w * 0.28
-    const vw = w * 0.14
-    const hy = h * 0.4
-    const hh = h * 0.2
     lines.push(
-      { x1: vx, y1: 0, x2: vx, y2: h },
-      { x1: vx + vw, y1: 0, x2: vx + vw, y2: h },
-      { x1: 0, y1: hy, x2: w, y2: hy },
-      { x1: 0, y1: hy + hh, x2: w, y2: hy + hh },
+      { x1: W * 0.28, y1: 0, x2: W * 0.28, y2: H },
+      { x1: W * 0.42, y1: 0, x2: W * 0.42, y2: H },
+      { x1: 0, y1: H * 0.4, x2: W, y2: H * 0.4 },
+      { x1: 0, y1: H * 0.6, x2: W, y2: H * 0.6 },
+    )
+    return lines
+  }
+
+  if (l.special === 'nordic-bordered') {
+    lines.push(
+      { x1: W * 0.26, y1: 0, x2: W * 0.26, y2: H },
+      { x1: W * 0.44, y1: 0, x2: W * 0.44, y2: H },
+      { x1: W * 0.3, y1: 0, x2: W * 0.3, y2: H },
+      { x1: W * 0.4, y1: 0, x2: W * 0.4, y2: H },
+      { x1: 0, y1: H * 0.36, x2: W, y2: H * 0.36 },
+      { x1: 0, y1: H * 0.64, x2: W, y2: H * 0.64 },
+      { x1: 0, y1: H * 0.42, x2: W, y2: H * 0.42 },
+      { x1: 0, y1: H * 0.58, x2: W, y2: H * 0.58 },
+    )
+    return lines
+  }
+
+  if (l.special === 'canton-plain' || l.special === 'canton-stripes') {
+    const cw = W * (l.canton?.w ?? CANTON.w)
+    const ch = H * (l.canton?.h ?? CANTON.h)
+    lines.push(
+      { x1: cw, y1: 0, x2: cw, y2: ch },
+      { x1: 0, y1: ch, x2: cw, y2: ch },
+    )
+    if (l.special === 'canton-stripes') {
+      const n = l.stripeCount || 5
+      for (let i = 1; i < n; i++) {
+        const y = (H * i) / n
+        lines.push({ x1: y < ch ? cw : 0, y1: y, x2: W, y2: y })
+      }
+    }
+    return lines
+  }
+
+  if (l.special === 'hoist-triangle') {
+    lines.push(
+      { x1: 0, y1: 0, x2: W * 0.38, y2: H / 2 },
+      { x1: W * 0.38, y1: H / 2, x2: 0, y2: H },
+      { x1: 0, y1: H / 2, x2: W, y2: H / 2 },
     )
     return lines
   }
@@ -94,32 +260,62 @@ function layoutContours() {
     const total = ratios.reduce((a, b) => a + b, 0)
     let y = 0
     for (let i = 0; i < l.stripes - 1; i++) {
-      y += (h * ratios[i]) / total
-      lines.push({ x1: 0, y1: y, x2: w, y2: y })
+      y += (H * ratios[i]) / total
+      lines.push({ x1: 0, y1: y, x2: W, y2: y })
     }
   } else if (l.direction === 'vertical' && l.stripes > 1) {
     const ratios = l.ratios || Array(l.stripes).fill(1)
     const total = ratios.reduce((a, b) => a + b, 0)
     let x = 0
     for (let i = 0; i < l.stripes - 1; i++) {
-      x += (w * ratios[i]) / total
-      lines.push({ x1: x, y1: 0, x2: x, y2: h })
+      x += (W * ratios[i]) / total
+      lines.push({ x1: x, y1: 0, x2: x, y2: H })
     }
   }
 
   return lines
 }
 
-/** Liefert den Farbindex der Fläche unter (x,y) im viewBox-Raum */
+function pointInTriangle(px, py, x1, y1, x2, y2, x3, y3) {
+  const d = (y2 - y3) * (x1 - x3) + (x3 - x2) * (y1 - y3)
+  const a = ((y2 - y3) * (px - x3) + (x3 - x2) * (py - y3)) / d
+  const b = ((y3 - y1) * (px - x3) + (x1 - x3) * (py - y3)) / d
+  const c = 1 - a - b
+  return a >= 0 && b >= 0 && c >= 0
+}
+
 function regionAt(x, y) {
   const l = layout.value
-  const w = 300
-  const h = 200
 
   if (l.special === 'nordic') {
-    const onVertical = x >= w * 0.28 && x <= w * 0.42
-    const onHorizontal = y >= h * 0.4 && y <= h * 0.6
+    const onVertical = x >= W * 0.28 && x <= W * 0.42
+    const onHorizontal = y >= H * 0.4 && y <= H * 0.6
     return onVertical || onHorizontal ? 1 : 0
+  }
+
+  if (l.special === 'nordic-bordered') {
+    const inInnerV = x >= W * 0.3 && x <= W * 0.4
+    const inInnerH = y >= H * 0.42 && y <= H * 0.58
+    if (inInnerV || inInnerH) return 2
+    const inOuterV = x >= W * 0.26 && x <= W * 0.44
+    const inOuterH = y >= H * 0.36 && y <= H * 0.64
+    if (inOuterV || inOuterH) return 1
+    return 0
+  }
+
+  if (l.special === 'canton-plain' || l.special === 'canton-stripes') {
+    const cw = W * (l.canton?.w ?? CANTON.w)
+    const ch = H * (l.canton?.h ?? CANTON.h)
+    if (x <= cw && y <= ch) return 0
+    if (l.special === 'canton-plain') return 1
+    const n = l.stripeCount || 5
+    const idx = Math.min(n - 1, Math.floor((y / H) * n))
+    return idx + 1
+  }
+
+  if (l.special === 'hoist-triangle') {
+    if (pointInTriangle(x, y, 0, 0, W * 0.38, H / 2, 0, H)) return 0
+    return y < H / 2 ? 1 : 2
   }
 
   if (l.direction === 'horizontal') {
@@ -127,7 +323,7 @@ function regionAt(x, y) {
     const total = ratios.reduce((a, b) => a + b, 0)
     let cy = 0
     for (let i = 0; i < l.stripes; i++) {
-      cy += (h * ratios[i]) / total
+      cy += (H * ratios[i]) / total
       if (y <= cy) return i
     }
     return l.stripes - 1
@@ -138,7 +334,7 @@ function regionAt(x, y) {
     const total = ratios.reduce((a, b) => a + b, 0)
     let cx = 0
     for (let i = 0; i < l.stripes; i++) {
-      cx += (w * ratios[i]) / total
+      cx += (W * ratios[i]) / total
       if (x <= cx) return i
     }
     return l.stripes - 1
@@ -154,11 +350,10 @@ function onClick(event) {
   pt.x = event.clientX
   pt.y = event.clientY
   const local = pt.matrixTransform(svg.getScreenCTM().inverse())
-  const index = regionAt(local.x, local.y)
-  emit('paint', index, props.paintColor)
+  emit('paint', regionAt(local.x, local.y), props.paintColor)
 }
 
-const rects = computed(() => stripeRects())
+const shapes = computed(() => buildShapes())
 const contours = computed(() => layoutContours())
 
 const renderedSymbols = computed(() => {
@@ -167,8 +362,8 @@ const renderedSymbols = computed(() => {
       const def = getSymbol(sym.type)
       const pos = getPosition(sym.position)
       const size = (sym.size || 0.35) * 100
-      const cx = pos.x * 300
-      const cy = pos.y * 200
+      const cx = pos.x * W
+      const cy = pos.y * H
       return {
         key: `${sym.type}-${idx}`,
         def,
@@ -191,15 +386,17 @@ const renderedSymbols = computed(() => {
     @click="onClick"
   >
     <rect x="0" y="0" width="300" height="200" fill="#ddd" />
-    <rect
-      v-for="(r, i) in rects"
-      :key="i"
-      :x="r.x"
-      :y="r.y"
-      :width="r.width"
-      :height="r.height"
-      :fill="r.fill"
-    />
+    <template v-for="(s, i) in shapes" :key="i">
+      <rect
+        v-if="s.type === 'rect'"
+        :x="s.x"
+        :y="s.y"
+        :width="s.width"
+        :height="s.height"
+        :fill="s.fill"
+      />
+      <polygon v-else-if="s.type === 'polygon'" :points="s.points" :fill="s.fill" />
+    </template>
     <g v-if="showContours && contours.length" class="contours" pointer-events="none">
       <line
         v-for="(c, i) in contours"

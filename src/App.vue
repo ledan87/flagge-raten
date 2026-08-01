@@ -8,6 +8,7 @@
       <nav class="nav">
         <router-link to="/raten">Flagge raten</router-link>
         <router-link to="/bauen">Flagge bauen</router-link>
+        <router-link to="/flaggen">Alle Flaggen</router-link>
       </nav>
     </header>
     <main class="app-main">

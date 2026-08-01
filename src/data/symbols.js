@@ -41,8 +41,49 @@ export const LAYOUTS = [
   { id: 'vertical-2', label: '2 Streifen vertikal', stripes: 2, direction: 'vertical' },
   { id: 'vertical-2-uneven', label: '2 Streifen ungleich (2:3)', stripes: 2, direction: 'vertical', ratios: [2, 3] },
   { id: 'vertical-3', label: '3 Streifen vertikal', stripes: 3, direction: 'vertical' },
-  { id: 'nordic-cross', label: 'Nordisches Kreuz', stripes: 1, direction: null, special: 'nordic' },
+  { id: 'nordic-cross', label: 'Nordisches Kreuz', stripes: 2, direction: null, special: 'nordic' },
+  {
+    id: 'nordic-cross-bordered',
+    label: 'Nordisches Kreuz (doppelt)',
+    stripes: 3,
+    direction: null,
+    special: 'nordic-bordered',
+  },
+  {
+    id: 'canton-plain',
+    label: 'Canton + Fläche',
+    stripes: 2,
+    direction: null,
+    special: 'canton-plain',
+    canton: { w: 0.4, h: 0.54 },
+  },
+  {
+    id: 'canton-stripes',
+    label: 'Canton + Streifen',
+    stripes: 6,
+    direction: null,
+    special: 'canton-stripes',
+    canton: { w: 0.4, h: 0.54 },
+    stripeCount: 5,
+  },
+  {
+    id: 'hoist-triangle',
+    label: 'Dreieck am Mast',
+    stripes: 3,
+    direction: null,
+    special: 'hoist-triangle',
+  },
+  {
+    id: 'serrated-hoist',
+    label: 'Schmaler Maststreifen',
+    stripes: 2,
+    direction: 'vertical',
+    ratios: [1, 3],
+  },
 ]
+
+/** Gemeinsame Canton-Maße (Anteil der Flaggenbreite/-höhe) */
+export const CANTON = { w: 0.4, h: 0.54 }
 
 /** Geometrische und Wappen-Symbole (viewBox 0 0 100 100) */
 export const SYMBOLS = [
