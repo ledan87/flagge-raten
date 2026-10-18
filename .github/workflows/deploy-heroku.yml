@@ -47,7 +47,7 @@ jobs:
       - name: Deploy using Heroku Git
         shell: bash
         env:
-          HEROKU_APP_NAME: ${{ vars.HEROKU_APP_NAME || secrets.HEROKU_APP_NAME }}
+          HEROKU_APP_NAME: ${{ vars.HEROKU_APP_NAME || secrets.HEROKU_APP_NAME || 'flaggen-raten' }}
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
           set -euo pipefail

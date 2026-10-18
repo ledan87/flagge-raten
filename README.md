@@ -51,16 +51,17 @@ Parallele Deployments werden nacheinander ausgeführt.
    | Bereich | Name | Wert |
    | --- | --- | --- |
    | Secrets > New repository secret | `HEROKU_API_KEY` | Dein Heroku-API-Key bzw. gültiger Heroku-Token |
-   | Variables > New repository variable | `HEROKU_APP_NAME` | Name der bestehenden Heroku-App, ohne URL oder `.git` |
+   | Variables > New repository variable (optional) | `HEROKU_APP_NAME` | Andere Heroku-App; Standard ist `flaggen-raten` |
 
    `HEROKU_APP_NAME` darf alternativ als Repository-Secret hinterlegt werden.
-   Falls beides existiert, hat die Variable Vorrang.
+   Falls beides existiert, hat die Variable Vorrang. Ohne diese Einstellung
+   wird die App `flaggen-raten` verwendet.
 
 3. Den API-Key findest du unter [Heroku Account settings](https://dashboard.heroku.com/account)
    im Abschnitt **API Key**. Alternativ zeigt `heroku auth:token` nach `heroku login`
    den aktuellen CLI-Token an. CLI-Token können ablaufen; dann das GitHub-Secret erneuern.
    Verwendest du ein separates Deployment-Konto, muss dieses Zugriff auf die App haben.
-4. Sobald der Workflow in `master` liegt und beide Werte gesetzt sind, wähle
+4. Sobald der Workflow in `master` liegt und der API-Key gesetzt ist, wähle
    **Actions > Test and deploy to Heroku > Run workflow > Branch: master**.
    Jeder folgende Push auf `master` startet das Deployment automatisch.
 
