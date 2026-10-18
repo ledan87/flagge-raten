@@ -1,0 +1,84 @@
+name: Test and deploy to Heroku
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Test and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Check out source
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          persist-credentials: false
+      - name: Set up Node.js
+        uses: actions/setup-node@249970729cb0ef3589644e2896645e5dc5ba9c38 # v6
+        with:
+          node-version-file: package.json
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run build
+
+  deploy:
+    name: Deploy master to Heroku
+    needs: validate
+    if: github.ref == 'refs/heads/master' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    concurrency:
+      group: heroku-production
+      cancel-in-progress: false
+    steps:
+      - name: Check out full history for Heroku Git
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Deploy using Heroku Git
+        shell: bash
+        env:
+          HEROKU_APP_NAME: ${{ vars.HEROKU_APP_NAME }}
+          HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
+        run: |
+          set -euo pipefail
+          if [[ -z "$HEROKU_APP_NAME" ]]; then
+            echo '::error::Set the repository variable HEROKU_APP_NAME in Settings > Secrets and variables > Actions.'
+            exit 1
+          fi
+          if [[ ! "$HEROKU_APP_NAME" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
+            echo '::error::HEROKU_APP_NAME must be an app name, not a URL.'
+            exit 1
+          fi
+          if [[ -z "$HEROKU_API_KEY" ]]; then
+            echo '::error::Set the repository secret HEROKU_API_KEY in Settings > Secrets and variables > Actions.'
+            exit 1
+          fi
+
+          # The key stays out of URLs, Git configuration and shell arguments.
+          askpass_path="$(mktemp "$RUNNER_TEMP/heroku-askpass.XXXXXX")"
+          trap 'rm -f "$askpass_path"' EXIT
+          cat > "$askpass_path" <<'ASKPASS'
+          #!/usr/bin/env bash
+          case "$1" in
+            *Username*) printf '\n' ;;
+            *Password*) printf '%s\n' "$HEROKU_API_KEY" ;;
+            *) exit 1 ;;
+          esac
+          ASKPASS
+          chmod 700 "$askpass_path"
+          export GIT_ASKPASS="$askpass_path"
+          export GIT_TERMINAL_PROMPT=0
+          export LC_ALL=C
+          git -c credential.helper= push \
+            "https://git.heroku.com/${HEROKU_APP_NAME}.git" \
+            HEAD:refs/heads/master
