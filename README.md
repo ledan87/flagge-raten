@@ -46,11 +46,13 @@ Parallele Deployments werden nacheinander ausgeführt.
 
 1. Die Heroku-App muss bereits existieren und das verwendete Heroku-Konto muss
    Deploy-Rechte dafür haben. Den App-Namen findest du im Heroku-Dashboard.
-2. Öffne im GitHub-Repository **Settings > Secrets and variables > Actions**:
+2. Öffne im GitHub-Repository **Settings > Environments > Heroku Deployment**.
+   Der Deployment-Job verwendet genau diese Umgebung. Alternativ funktionieren
+   auch Repository-Secrets unter **Settings > Secrets and variables > Actions**:
 
    | Bereich | Name | Wert |
    | --- | --- | --- |
-   | Secrets > New repository secret | `HEROKU_API_KEY` | Dein Heroku-API-Key bzw. gültiger Heroku-Token |
+   | Environment secrets > Add environment secret (oder Repository secret) | `HEROKU_API_KEY` | Dein Heroku-API-Key bzw. gültiger Heroku-Token |
    | Variables > New repository variable (optional) | `HEROKU_APP_NAME` | Andere Heroku-App; Standard ist `flaggen-raten` |
 
    `HEROKU_APP_NAME` darf alternativ als Repository-Secret hinterlegt werden.
