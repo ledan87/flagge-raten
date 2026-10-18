@@ -65,6 +65,33 @@ jobs:
             exit 1
           fi
 
+          # Check token validity separately from Git authentication.
+          python3 - <<'PYTHON'
+          import json, os, urllib.error, urllib.request
+          app = os.environ['HEROKU_APP_NAME']
+          token = os.environ['HEROKU_API_KEY']
+          request = urllib.request.Request(
+              f'https://api.heroku.com/apps/{app}',
+              headers={'Authorization': f'Bearer {token}',
+                       'Accept': 'application/vnd.heroku+json; version=3'})
+          try:
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  info = json.load(response)
+              print('Heroku API authentication successful for app ' + info['name'])
+              print('App URL: ' + info.get('web_url', 'not provided'))
+          except urllib.error.HTTPError as error:
+              if error.code == 401:
+                  print('::error::Heroku rejected HEROKU_API_KEY (HTTP 401). Replace it with a valid Heroku API key or token.')
+              elif error.code in (403, 404):
+                  print('::error::The Heroku token cannot access the configured app (HTTP ' + str(error.code) + '). Check app name and account permissions.')
+              else:
+                  print('::error::Heroku API request failed (HTTP ' + str(error.code) + ').')
+              raise SystemExit(1)
+          except (ValueError, urllib.error.URLError):
+              print('::error::Heroku API request failed. Check token formatting and network connectivity.')
+              raise SystemExit(1)
+          PYTHON
+
           # The key stays out of URLs, Git configuration and shell arguments.
           askpass_path="$(mktemp "$RUNNER_TEMP/heroku-askpass.XXXXXX")"
           trap 'rm -f "$askpass_path"' EXIT
