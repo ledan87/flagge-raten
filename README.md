@@ -77,8 +77,10 @@ entsprechend aktualisiert werden.
 Der Workflow verwendet nur die offiziellen Checkout-/Node-Actions und Git; eine
 Heroku-CLI oder eine zusätzliche Deployment-Action ist nicht erforderlich.
 Fehlende Konfiguration wird mit einer verständlichen Fehlermeldung gemeldet.
-Er überschreibt keine abweichende Heroku-Git-Historie per Force-Push. Falls Heroku
-`non-fast-forward` meldet, zuerst die bisherige Deployment-Historie prüfen.
+GitHub ist die maßgebliche Quellcode-Historie; Heroku Git dient als Deployment-Spiegel.
+Vor dem Push wird der aktuelle Heroku-Branch-Stand gelesen. Mit `--force-with-lease`
+wird der gewünschte GitHub-Stand auch bei abweichender alter Deployment-Historie
+übertragen, aber eine zwischenzeitliche Änderung auf Heroku nicht überschrieben.
 Falls bisher zusätzlich Herokus GitHub-Autodeploy aktiv ist, diesen deaktivieren,
 um doppelte Deployments zu vermeiden.
 

@@ -107,8 +107,13 @@ jobs:
           export GIT_ASKPASS="$askpass_path"
           export GIT_TERMINAL_PROMPT=0
           export LC_ALL=C
+          heroku_url="https://git.heroku.com/${HEROKU_APP_NAME}.git"
+          # GitHub is the source of truth; Heroku Git is only the deployment mirror.
+          # Lease the observed remote SHA so a concurrent push is never overwritten.
+          remote_sha="$(git -c credential.helper= ls-remote "$heroku_url" refs/heads/master | awk '{print $1}')"
           git -c credential.helper= push \
-            "https://git.heroku.com/${HEROKU_APP_NAME}.git" \
+            --force-with-lease="refs/heads/master:${remote_sha}" \
+            "$heroku_url" \
             HEAD:refs/heads/master 2>&1 | while IFS= read -r message; do
               printf '%s\n' "$message"
               if [[ "$message" == fatal:* || "$message" == error:* || "$message" == *"remote: !"* || "$message" == *"[rejected]"* || "$message" == *"[remote rejected]"* || "$message" == hint:* ]]; then
