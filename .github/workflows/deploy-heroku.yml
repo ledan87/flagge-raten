@@ -77,8 +77,8 @@ jobs:
           try:
               with urllib.request.urlopen(request, timeout=30) as response:
                   info = json.load(response)
-              print('Heroku API authentication successful for app ' + info['name'])
-              print('App URL: ' + info.get('web_url', 'not provided'))
+              print('::notice::Heroku API authentication successful for app ' + info['name'])
+              print('::notice::App URL: ' + info.get('web_url', 'not provided'))
           except urllib.error.HTTPError as error:
               if error.code == 401:
                   print('::error::Heroku rejected HEROKU_API_KEY (HTTP 401). Replace it with a valid Heroku API key or token.')
@@ -98,7 +98,7 @@ jobs:
           cat > "$askpass_path" <<'ASKPASS'
           #!/usr/bin/env bash
           case "$1" in
-            *Username*) printf '\n' ;;
+            *Username*) printf 'heroku\n' ;;
             *Password*) printf '%s\n' "$HEROKU_API_KEY" ;;
             *) exit 1 ;;
           esac
