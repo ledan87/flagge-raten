@@ -53,6 +53,9 @@ Parallele Deployments werden nacheinander ausgeführt.
    | Secrets > New repository secret | `HEROKU_API_KEY` | Dein Heroku-API-Key bzw. gültiger Heroku-Token |
    | Variables > New repository variable | `HEROKU_APP_NAME` | Name der bestehenden Heroku-App, ohne URL oder `.git` |
 
+   `HEROKU_APP_NAME` darf alternativ als Repository-Secret hinterlegt werden.
+   Falls beides existiert, hat die Variable Vorrang.
+
 3. Den API-Key findest du unter [Heroku Account settings](https://dashboard.heroku.com/account)
    im Abschnitt **API Key**. Alternativ zeigt `heroku auth:token` nach `heroku login`
    den aktuellen CLI-Token an. CLI-Token können ablaufen; dann das GitHub-Secret erneuern.

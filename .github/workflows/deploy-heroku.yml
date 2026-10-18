@@ -47,12 +47,12 @@ jobs:
       - name: Deploy using Heroku Git
         shell: bash
         env:
-          HEROKU_APP_NAME: ${{ vars.HEROKU_APP_NAME }}
+          HEROKU_APP_NAME: ${{ vars.HEROKU_APP_NAME || secrets.HEROKU_APP_NAME }}
           HEROKU_API_KEY: ${{ secrets.HEROKU_API_KEY }}
         run: |
           set -euo pipefail
           if [[ -z "$HEROKU_APP_NAME" ]]; then
-            echo '::error::Set the repository variable HEROKU_APP_NAME in Settings > Secrets and variables > Actions.'
+            echo '::error::Set the repository variable or secret HEROKU_APP_NAME in Settings > Secrets and variables > Actions.'
             exit 1
           fi
           if [[ ! "$HEROKU_APP_NAME" =~ ^[a-z0-9][a-z0-9-]*$ ]]; then
