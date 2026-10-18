@@ -16,6 +16,14 @@ Die Bundesländer-Rubrik liegt unter `/bundeslaender`, die Spielarten unter
 können am Ende gezielt wiederholt werden. Die Lernübersicht zeigt alle Paare.
 Die Kartendaten sind lokal gebündelt; es wird kein Kartendienst benötigt.
 
+5. **HSU-Quiz** – Fragen aus den Themen des Merkhefts für die 4. Klasse unter `/hsu`:
+   Himmelsrichtungen, Kartenzeichen, Höhenlinien, Deutschland mit allen Landeshauptstädten
+   und demokratische Wahlen. Themen einzeln oder gemischt üben, bis zu 10/20 Fragen oder
+   den gesamten Themenvorrat wählen. Freitext- und Auswahlfragen, eigene SVG-Abbildungen,
+   Erklärungen nach jeder Antwort, Auswertung je Thema und gezielte Fehlerwiederholung.
+   Gemischte Runden berücksichtigen alle fünf Themen. Jede Frage wird pro Runde höchstens
+   einmal gestellt. Die Aufgaben sind Übungsfragen, keine Vorhersage der Klassenarbeit.
+
 ## Lokal starten
 
 ```bash

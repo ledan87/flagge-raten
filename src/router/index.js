@@ -3,11 +3,13 @@ import HomeView from '../views/HomeView.vue'
 import GuessView from '../views/GuessView.vue'
 import BuilderView from '../views/BuilderView.vue'
 import FederalStatesView from '../views/FederalStatesView.vue'
+import HsuQuizView from '../views/HsuQuizView.vue'
 
 const router = createRouter({
   history: createWebHistory(),
   routes: [
     { path: '/', name: 'home', component: HomeView },
+    { path: '/hsu', name: 'hsu', component: HsuQuizView },
     { path: '/raten', name: 'guess', component: GuessView },
     { path: '/bauen', name: 'builder', component: BuilderView },
     { path: '/bundeslaender/:mode(hauptstaedte|karte)?', name: 'states', component: FederalStatesView },

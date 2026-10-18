@@ -6,7 +6,7 @@
     <section class="hero">
       <h1>Flaggen-Raten</h1>
       <p class="subtitle">
-        Entdecke die Flaggen der Welt und die Bundesländer Deutschlands.
+        Entdecke die Flaggen der Welt, lerne die Bundesländer und übe für deine HSU-Probe.
       </p>
     </section>
 
@@ -29,6 +29,12 @@
         <h2>Bundesländer</h2>
         <p>Rate die 16 Landeshauptstädte und finde die Bundesländer auf der Deutschlandkarte.</p>
         <span class="mode-cta">Deutschland entdecken →</span>
+      </router-link>
+      <router-link to="/hsu" class="mode-card">
+        <div class="mode-icon">📚</div>
+        <h2>HSU-Quiz</h2>
+        <p>Übe die Themen aus deinem Merkheft: Himmelsrichtungen, Karten, Berge, Deutschland und Wahlen.</p>
+        <span class="mode-cta">Für die Probe üben →</span>
       </router-link>
     </div>
   </div>
