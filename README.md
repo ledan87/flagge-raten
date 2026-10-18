@@ -32,20 +32,67 @@ npm start
 
 Die App läuft dann auf [http://localhost:3000](http://localhost:3000).
 
-## Deploy auf Heroku
+## Automatisch nach Heroku deployen
 
-Voraussetzungen: [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) und ein Heroku-Account.
+Der Workflow [Test and deploy to Heroku](.github/workflows/deploy-heroku.yml)
+prüft bei Pull Requests und Pushes auf `master` die Tests und den Produktionsbuild.
+Nach einem erfolgreichen Push auf `master` wird genau dieser Commit per HTTPS-Git
+zur bestehenden Heroku-App gepusht. Auch ein Merge in `master` löst das Deployment aus.
+Pull Requests deployen nicht. Unter **Actions > Test and deploy to Heroku > Run workflow**
+kannst du den Workflow für `master` manuell starten, etwa nach dem Einrichten der Secrets.
+Parallele Deployments werden nacheinander ausgeführt.
+
+### Einmalige Einrichtung
+
+1. Die Heroku-App muss bereits existieren und das verwendete Heroku-Konto muss
+   Deploy-Rechte dafür haben. Den App-Namen findest du im Heroku-Dashboard.
+2. Öffne im GitHub-Repository **Settings > Secrets and variables > Actions**:
+
+   | Bereich | Name | Wert |
+   | --- | --- | --- |
+   | Secrets > New repository secret | `HEROKU_API_KEY` | Dein Heroku-API-Key bzw. gültiger Heroku-Token |
+   | Variables > New repository variable | `HEROKU_APP_NAME` | Name der bestehenden Heroku-App, ohne URL oder `.git` |
+
+3. Den API-Key findest du unter [Heroku Account settings](https://dashboard.heroku.com/account)
+   im Abschnitt **API Key**. Alternativ zeigt `heroku auth:token` nach `heroku login`
+   den aktuellen CLI-Token an. CLI-Token können ablaufen; dann das GitHub-Secret erneuern.
+   Verwendest du ein separates Deployment-Konto, muss dieses Zugriff auf die App haben.
+4. Sobald der Workflow in `master` liegt und beide Werte gesetzt sind, wähle
+   **Actions > Test and deploy to Heroku > Run workflow > Branch: master**.
+   Jeder folgende Push auf `master` startet das Deployment automatisch.
+
+Das Secret enthält den Token selbst, nicht das Heroku-Passwort und nicht einen
+GitHub-Personal-Access-Token. Ein `HEROKU_EMAIL`-Secret ist bei diesem Workflow nicht nötig.
+Den API-Key ausschließlich als GitHub-Secret hinterlegen, nicht committen oder in
+Chat-Nachrichten einfügen. Der Key berechtigt zum Zugriff auf die vom Konto erreichbaren
+Heroku-Ressourcen. Beim Erneuern oder Widerrufen des Keys muss das GitHub-Secret
+entsprechend aktualisiert werden.
+
+Der Workflow verwendet nur die offiziellen Checkout-/Node-Actions und Git; eine
+Heroku-CLI oder eine zusätzliche Deployment-Action ist nicht erforderlich.
+Fehlende Konfiguration wird mit einer verständlichen Fehlermeldung gemeldet.
+Er überschreibt keine abweichende Heroku-Git-Historie per Force-Push. Falls Heroku
+`non-fast-forward` meldet, zuerst die bisherige Deployment-Historie prüfen.
+Falls bisher zusätzlich Herokus GitHub-Autodeploy aktiv ist, diesen deaktivieren,
+um doppelte Deployments zu vermeiden.
+
+Heroku setzt `PORT` automatisch. `heroku-postbuild` erzeugt bei Heroku den Vite-Build,
+und `Procfile` startet den Express-Server, der `dist/` ausliefert.
+
+Quellen: [Heroku Git-Authentifizierung](https://devcenter.heroku.com/articles/git#http-git-authentication),
+[Heroku-Token](https://devcenter.heroku.com/articles/authentication#retrieving-the-api-token),
+[GitHub Actions Secrets](https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets).
+
+## Manuell nach Heroku deployen
+
+Mit installierter [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli):
 
 ```bash
 heroku login
-heroku create dein-app-name
-git add .
-git commit -m "Initial commit"
-git push heroku main
+heroku git:remote -a dein-app-name
+git push heroku master
 heroku open
 ```
-
-Heroku setzt `PORT` automatisch. Der Express-Server in `server.js` liefert den Vite-Build aus `dist/` aus. Beim Deploy läuft `heroku-postbuild` (`npm run build`).
 
 ## Tech-Stack
 
