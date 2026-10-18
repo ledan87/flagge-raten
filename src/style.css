@@ -69,6 +69,7 @@ body {
 .nav {
   display: flex;
   gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 .nav a {
@@ -136,3 +137,7 @@ body {
     justify-content: center;
   }
 }
+
+:focus-visible { outline: 2px solid #a9c6ff; outline-offset: 4px; }
+
+@media (max-width: 400px) { .nav a { padding: .4rem .5rem; font-size: .85rem; } }

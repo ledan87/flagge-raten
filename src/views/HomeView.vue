@@ -6,7 +6,7 @@
     <section class="hero">
       <h1>Flaggen-Raten</h1>
       <p class="subtitle">
-        Teste dein Wissen über die Flaggen der Welt – errate Länder oder baue Flaggen selbst nach.
+        Entdecke die Flaggen der Welt und die Bundesländer Deutschlands.
       </p>
     </section>
 
@@ -23,6 +23,12 @@
         <h2>Flagge bauen</h2>
         <p>Ein Land wird genannt – baue die Flagge aus Streifen, Farben und Symbolen (Sterne, Halbmond, Wappen …).</p>
         <span class="mode-cta">Bauen →</span>
+      </router-link>
+      <router-link to="/bundeslaender" class="mode-card">
+        <div class="mode-icon">🗺️</div>
+        <h2>Bundesländer</h2>
+        <p>Rate die 16 Landeshauptstädte und finde die Bundesländer auf der Deutschlandkarte.</p>
+        <span class="mode-cta">Deutschland entdecken →</span>
       </router-link>
     </div>
   </div>
